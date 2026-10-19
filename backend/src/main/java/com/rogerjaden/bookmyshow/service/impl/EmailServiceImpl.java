@@ -30,7 +30,6 @@ public class EmailServiceImpl {
             @Value("${brevo.from-email}") String fromEmail,
             @Value("${brevo.from-name:BMS-Clone}") String fromName) {
 
-        this.objectMapper = objectMapper;
         this.apiKey = apiKey;
         this.fromEmail = fromEmail;
         this.fromName = fromName;
