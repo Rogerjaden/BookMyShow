@@ -22,7 +22,7 @@ import Dashboard from './pages/public/Dashboard';
 import TicketDetails from './pages/public/TicketDetails';
 import WishlistPage from './pages/public/WishlistPage';
 import NotificationsPage from './pages/public/NotificationsPage';
-import VerifyEmail from './pages/public/VerifyEmail';
+import VerifyEmail from './pages/public/verifyEmail';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
