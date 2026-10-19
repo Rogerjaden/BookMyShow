@@ -1,10 +1,10 @@
 package com.rogerjaden.bookmyshow.security;
 
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +29,11 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -37,43 +42,41 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        String token = null;
-        String username = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
 
-        if (authHeader != null &&
-                authHeader.startsWith("Bearer ")) {
+            try {
+                String username = jwtService.extractUserName(token);
 
-            token = authHeader.substring(7);
-            username = jwtService.extractUserName(token);
-        }
+                if (username != null &&
+                        SecurityContextHolder.getContext()
+                                .getAuthentication() == null) {
 
-        if (username != null &&
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication() == null) {
+                    UserDetails userDetails =
+                            userDetailsService.loadUserByUsername(username);
 
-            UserDetails userDetails =
-                    userDetailsService
-                            .loadUserByUsername(username);
+                    if (jwtService.validateToken(token, userDetails)
+                            && userDetails.isEnabled()) {
 
-            if (jwtService.validateToken(token, userDetails)
-                    && userDetails.isEnabled()) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource()
+                                        .buildDetails(request)
                         );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authToken);
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(authToken);
+                    }
+                }
+            } catch (io.jsonwebtoken.JwtException |
+                     IllegalArgumentException ex) {
+                SecurityContextHolder.clearContext();
             }
         }
 
