@@ -19,14 +19,13 @@ public class EmailServiceImpl {
     private static final String BREVO_API_URL =
             "https://api.brevo.com/v3/smtp/email";
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient;
     private final String apiKey;
     private final String fromEmail;
     private final String fromName;
 
     public EmailServiceImpl(
-            ObjectMapper objectMapper,
             @Value("${brevo.api-key}") String apiKey,
             @Value("${brevo.from-email}") String fromEmail,
             @Value("${brevo.from-name:BMS-Clone}") String fromName) {
