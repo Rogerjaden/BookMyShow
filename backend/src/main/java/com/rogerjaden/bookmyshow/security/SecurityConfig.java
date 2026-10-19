@@ -1,4 +1,3 @@
-
 package com.rogerjaden.bookmyshow.security;
 
 import java.util.List;
@@ -74,7 +73,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://YOUR-FRONTEND-NAME.onrender.com"
+                "https://bookmyshow-qlpj.onrender.com"
         ));
 
         configuration.setAllowedMethods(List.of(
