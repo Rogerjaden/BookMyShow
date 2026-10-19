@@ -1,0 +1,55 @@
+
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.bak
+test-output.txt
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local-only Spring configuration
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Frontend dependencies and build output
+bms-frontend/node_modules/
+bms-frontend/dist/

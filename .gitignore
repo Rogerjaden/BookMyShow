@@ -1,0 +1,38 @@
+
+# Java / Maven
+backend/target/
+backend/.idea/
+backend/*.iml
+
+# React / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+
+# Local-only Spring configuration
+backend/src/main/resources/application-local.properties
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-local.yaml
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs and temporary output
+*.log
+logs/
+*.tmp
+*.bak
+test-output.txt
+
+# OS
+.DS_Store
+Thumbs.db

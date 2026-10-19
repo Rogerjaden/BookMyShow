@@ -1,0 +1,342 @@
+/* ------------------------------------------------------------------
+   Cinema screen
+------------------------------------------------------------------- */
+.cinema-screen {
+  margin: 0 auto 6px;
+  text-align: center;
+  animation: screenOn 1200ms ease-out both;
+}
+.cinema-screen__curve {
+  display: block;
+  width: 100%;
+  height: 46px;
+  overflow: visible;
+}
+.cinema-screen__label {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes screenOn {
+  0% { opacity: 0; filter: brightness(0.2); }
+  30% { opacity: 0.45; filter: brightness(0.6); }
+  38% { opacity: 0.3; }
+  100% { opacity: 1; filter: none; }
+}
+
+/* ------------------------------------------------------------------
+   Seat stage: the light beam from the screen, the grid and the tooltip
+------------------------------------------------------------------- */
+.seat-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 40px 0 12px;
+  margin-top: -34px;
+}
+
+.seat-stage {
+  position: relative;
+  width: max-content;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.seat-stage::before {
+  content: '';
+  position: absolute;
+  inset: 34px 4% 0 4%;
+  background: linear-gradient(180deg, rgba(144, 202, 249, 0.17), rgba(144, 202, 249, 0) 78%);
+  clip-path: polygon(12% 0, 88% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+  animation: beamOn 1500ms ease-out both;
+}
+@keyframes beamOn {
+  0%, 25% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.seat-grid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap, 6px);
+  padding: 0 6px;
+}
+
+.seat-row {
+  display: grid;
+  grid-template-columns: var(--label, 26px) repeat(var(--cols, 1), var(--seat, 34px)) var(--label, 26px);
+  column-gap: var(--gap, 6px);
+  align-items: center;
+}
+.seat-row__label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  user-select: none;
+}
+
+.seat-tier {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0 2px calc(var(--label, 26px) + var(--gap, 6px));
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+.seat-tier:first-child { margin-top: 0; }
+.seat-tier strong { color: rgba(255, 255, 255, 0.9); font-weight: 700; }
+.seat-tier::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* ------------------------------------------------------------------
+   Seats
+------------------------------------------------------------------- */
+.seat-cell {
+  width: var(--seat, 34px);
+  height: var(--seat, 34px);
+  animation: seatIn 460ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+
+.seat {
+  --seat-color: #5b8def;
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease, opacity 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.seat svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.seat .part,
+.seat-swatch .part { fill: var(--seat-color); transition: fill 200ms ease; }
+.seat .arm,
+.seat-swatch .arm { filter: brightness(0.7); }
+.seat .cushion,
+.seat-swatch .cushion { filter: brightness(0.92); }
+.seat .foot,
+.seat-swatch .foot { filter: brightness(0.55); }
+.seat .headrest,
+.seat-swatch .headrest { fill: rgba(255, 255, 255, 0.4); }
+
+.seat__num {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 15%;
+  text-align: center;
+  font-size: calc(var(--seat, 34px) * 0.3);
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.seat:hover:not(:disabled) { transform: translateY(-3px) scale(1.07); filter: brightness(1.18); }
+.seat:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 8px; }
+
+.seat[data-state='selected'] {
+  --seat-color: #ff5252;
+  filter: drop-shadow(0 0 6px rgba(255, 82, 82, 0.7));
+  animation: seatPick 380ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.seat[data-state='selected']::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 82, 82, 0.85);
+  pointer-events: none;
+  animation: seatRing 600ms ease-out both;
+}
+
+.seat[data-state='booked'] { --seat-color: #3a3a42; cursor: not-allowed; }
+.seat[data-state='booked'] .seat__num { color: rgba(255, 255, 255, 0.35); font-size: calc(var(--seat, 34px) * 0.38); }
+.seat[data-state='locked'] { --seat-color: #6c6c76; opacity: 0.7; cursor: not-allowed; }
+.seat[data-state='blocked'] { --seat-color: #2b2b31; opacity: 0.45; cursor: not-allowed; }
+
+@keyframes seatIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes seatPick {
+  0% { transform: scale(0.82); }
+  55% { transform: scale(1.26) translateY(-4px); }
+  100% { transform: scale(1.08); }
+}
+@keyframes seatRing {
+  from { opacity: 1; transform: scale(0.8); }
+  to { opacity: 0; transform: scale(1.7); }
+}
+
+/* Single floating tooltip shared by every seat */
+.seat-tip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -100%);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 12, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tipIn 120ms ease-out both;
+}
+.seat-tip strong { display: block; font-size: 13px; }
+.seat-tip span { color: rgba(255, 255, 255, 0.65); }
+@keyframes tipIn {
+  from { opacity: 0; transform: translate(-50%, -92%); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+/* Legend swatches */
+.seat-swatch {
+  --seat-color: #5b8def;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+.seat-swatch svg { display: block; width: 100%; height: 100%; }
+
+/* ------------------------------------------------------------------
+   Seat layout designer (admin)
+------------------------------------------------------------------- */
+.dz-cell {
+  position: relative;
+  width: var(--seat, 34px);
+  height: var(--seat, 34px);
+  border-radius: 8px;
+  cursor: crosshair;
+  touch-action: manipulation;
+  user-select: none;
+}
+.dz-cell--empty::before {
+  content: '';
+  position: absolute;
+  inset: 22%;
+  border-radius: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  transition: border-color 120ms ease, background 120ms ease, inset 120ms ease;
+}
+.dz-cell--empty:hover::before {
+  inset: 12%;
+  border-color: var(--tool-color, rgba(255, 255, 255, 0.5));
+  background: color-mix(in srgb, var(--tool-color, #fff) 18%, transparent);
+}
+.dz-cell .seat { cursor: crosshair; }
+.dz-cell:hover .seat { transform: scale(1.08); }
+
+.dz-cell--paint { animation: dzPaint 320ms cubic-bezier(0.2, 1.3, 0.4, 1) both; }
+@keyframes dzPaint {
+  0% { transform: scale(0.5); opacity: 0.2; }
+  60% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Seats that are new and not saved yet */
+.dz-cell--new .seat {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--seat-color) 80%, transparent));
+}
+.dz-cell--new::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+/* Seats changed since the last save */
+.dz-cell--edited::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb300;
+  box-shadow: 0 0 0 2px #1e1e1e;
+  pointer-events: none;
+}
+/* Seats that will be removed on save */
+.dz-cell--removed::before {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border-radius: 7px;
+  border: 1.5px dashed rgba(255, 82, 82, 0.8);
+  background: repeating-linear-gradient(45deg, rgba(255, 82, 82, 0.14) 0 4px, transparent 4px 8px);
+  pointer-events: none;
+}
+
+/* Maintenance seats: faded, with a warning stripe */
+.seat[data-state='maintenance'] { opacity: 0.55; }
+.seat[data-state='maintenance'] .part { fill: #8a7f66; }
+.seat[data-state='maintenance'] .seat__num { color: #ffd54f; }
+
+.dz-head {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  border-radius: 6px;
+  user-select: none;
+  transition: color 120ms ease, background 120ms ease;
+}
+.dz-head:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.dz-rowhead { font-size: 12px; font-weight: 700; }
+
+.dz-saved-sweep { position: relative; overflow: hidden; }
+.dz-saved-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(76, 175, 80, 0.28) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: sweep 900ms ease-out both;
+  pointer-events: none;
+}
+@keyframes sweep { to { transform: translateX(100%); } }
+
+/* Mini seat map on screen cards */
+.mini-map { display: grid; gap: 2px; justify-content: center; }
+.mini-map i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 1.5px;
+  background: var(--seat-color);
+  animation: miniIn 360ms ease-out both;
+}
+@keyframes miniIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .seat-cell, .seat, .cinema-screen, .seat-stage::before, .dz-cell--paint,
+  .mini-map i, .seat-tip, .dz-saved-sweep::after, .seat[data-state='selected']::after {
+    animation: none !important;
+  }
+  .seat { transition: none !important; }
+}
